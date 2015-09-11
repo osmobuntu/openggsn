@@ -68,6 +68,7 @@ const char *gengetopt_args_info_help[] = {
 	"      --pingcount=INT    Number of ping req to send  (default=`0')",
 	"      --pingquiet        Do not print ping packet info  (default=off)",
 	"      --norecovery       Do not send recovery (default=off)",
+    	"      --apn_3gpp         Send APN in Create PDP request in 3GPP form",
 	0
 };
 
@@ -149,6 +150,8 @@ void clear_given(struct gengetopt_args_info *args_info)
 	args_info->pingcount_given = 0;
 	args_info->pingquiet_given = 0;
 	args_info->norecovery_given = 0;
+    	args_info->apn_3gpp_given = 0;
+
 }
 
 static
@@ -227,6 +230,7 @@ void clear_args(struct gengetopt_args_info *args_info)
 	args_info->pingcount_orig = NULL;
 	args_info->pingquiet_flag = 0;
 	args_info->norecovery_flag = 0;
+    	args_info->apn_3gpp_flag = 0;
 
 }
 
@@ -265,6 +269,7 @@ void init_args_info(struct gengetopt_args_info *args_info)
 	args_info->pingcount_help = gengetopt_args_info_help[29];
 	args_info->pingquiet_help = gengetopt_args_info_help[30];
 	args_info->norecovery_help = gengetopt_args_info_help[31];
+    	args_info->apn_3gpp_help = gengetopt_args_info_help[32];
 
 }
 
@@ -697,6 +702,10 @@ cmdline_parser_file_save(const char *filename,
 		fprintf(outfile, "%s\n", "norecovery");
 	}
 
+	if (args_info->apn_3gpp_given) {
+		fprintf(outfile, "%s\n", "apn_3gpp");
+	}
+
 	fclose(outfile);
 
 	i = EXIT_SUCCESS;
@@ -823,6 +832,7 @@ cmdline_parser_internal(int argc, char *const *argv,
 			{"pingcount", 1, NULL, 0},
 			{"pingquiet", 0, NULL, 0},
 			{"norecovery", 0, NULL, 0},
+	        	{"apn_3gpp", 0, NULL, 0},
 			{NULL, 0, NULL, 0}
 		};
 
@@ -1723,6 +1733,25 @@ cmdline_parser_internal(int argc, char *const *argv,
 				args_info->norecovery_given = 1;
 				args_info->norecovery_flag =
 				    !(args_info->norecovery_flag);
+			}
+            /* Send apn in 3gpp_form */
+			else if (strcmp
+				 (long_options[option_index].name,
+				  "apn_3gpp") == 0) {
+				if (local_args_info.apn_3gpp_given) {
+					fprintf(stderr,
+						"%s: `--apn_3gpp' option given more than once%s\n",
+						argv[0],
+						(additional_error ?
+						 additional_error : ""));
+					goto failure;
+				}
+				if (args_info->apn_3gpp_given && !override)
+					continue;
+				local_args_info.apn_3gpp_given = 1;
+				args_info->apn_3gpp_given = 1;
+				args_info->apn_3gpp_flag =
+				    !(args_info->apn_3gpp_flag);
 			}
 
 			break;

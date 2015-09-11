@@ -133,6 +133,9 @@ extern "C" {
 		const char *pingquiet_help;	/* Do not print ping packet info help description.  */
 		int norecovery_flag;	/* Do not print ping packet info (default=off).  */
 		const char *norecovery_help;	/* Do not print ping packet info help description.  */
+        	int apn_3gpp_flag;	/* Do not print ping packet info (default=off).  */
+		const char *apn_3gpp_help;	/* Do not print ping packet info help description.  */
+
 
 		int help_given;	/* Whether help was given.  */
 		int version_given;	/* Whether version was given.  */
@@ -175,6 +178,7 @@ extern "C" {
 		int pingcount_given;	/* Whether pingcount was given.  */
 		int pingquiet_given;	/* Whether pingquiet was given.  */
 		int norecovery_given;	/* Whether norecovery was given.  */
+        	int apn_3gpp_given;	/* Sends APN in 3gpp form.  */
 
 	};
 
