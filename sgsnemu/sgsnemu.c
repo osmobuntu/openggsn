@@ -114,6 +114,8 @@ struct {
 	int imeisv_given;
 	struct ul16_t msisdn;
 	int norecovery_given;
+	int apn_3gpp_given;
+
 } options;
 
 /* Definitions to use for PING. Most of the ping code was derived from */
@@ -152,6 +154,38 @@ int tmax = 0;
 int tsum = 0;
 int pingseq = 0;		/* Ping sequence counter */
 struct timeval firstping;
+
+struct ul255_t convert_apn_to_3gpp_form(struct ul255_t apn) {
+/*
+    in Create PDP Context Request SGSN must sends APN in following form:
+    first byte is the length of APN part up to first dot.
+    All other dots changed to length APN part up to next dot.
+    For example:
+    mms.com changed to
+    03mms03com
+*/
+    int l = sizeof(apn.v);
+    struct ul255_t result;
+    int j = 0;
+    int k = 1;
+    int i = 0;
+    for (i = 0; i < apn.l; i++) {
+        if(apn.v[i] == 46){
+            result.v[j] = i-j;
+            j = i+1;
+        } else {
+            result.v[k] = apn.v[i];
+        }
+        k++;
+    }
+    result.v[j] = i-j;
+    result.l = apn.l + 1;
+    result.v[apn.l+1] = 0;
+    for (i = apn.l+1;i < l; i++)
+        result.v[i] = 0;
+
+    return result;
+}
 
 int ipset(struct iphash_t *ipaddr, struct in_addr *addr)
 {
@@ -287,6 +321,8 @@ int process_options(int argc, char **argv)
 		printf("pingcount: %d\n", args_info.pingcount_arg);
 		printf("pingquiet: %d\n", args_info.pingquiet_flag);
 		printf("norecovery: %d\n", args_info.norecovery_flag);
+        	printf("apn_3gpp: %d\n", args_info.apn_3gpp_flag);
+
 	}
 
 	/* Try out our new parser */
@@ -344,6 +380,8 @@ int process_options(int argc, char **argv)
 			printf("pingcount: %d\n", args_info.pingcount_arg);
 			printf("pingquiet: %d\n", args_info.pingquiet_flag);
 			printf("norecovery: %d\n", args_info.norecovery_flag);
+            		printf("apn_3gpp: %d\n", args_info.apn_3gpp_flag);
+
 		}
 	}
 
@@ -901,6 +939,9 @@ int process_options(int argc, char **argv)
 
 	/* norecovery */
 	options.norecovery_given = args_info.norecovery_flag;
+   
+  	/*apn_3gpp form*/
+    	options.apn_3gpp_given = args_info.apn_3gpp_flag;
 
 	return 0;
 
@@ -1534,15 +1575,24 @@ int main(int argc, char **argv)
 
 		pdp->norecovery_given = options.norecovery_given;
 
+        	//pdp->apn_3gpp_given = options.apn_3gpp_given;
+
 		if (options.apn.l > sizeof(pdp->apn_use.v)) {
 			sys_err(LOG_ERR, __FILE__, __LINE__, 0,
 				"APN length too big");
 			exit(1);
 		} else {
-			pdp->apn_use.l = options.apn.l;
-			memcpy(pdp->apn_use.v, options.apn.v, options.apn.l);
+            pdp->apn_use.l = options.apn.l;
+            if (options.apn_3gpp_given) {
+                struct ul255_t apn_converted = convert_apn_to_3gpp_form(options.apn);
+                //printf("APN converted: %s  \n",apn_converted.v);
+                memcpy(pdp->apn_use.v, apn_converted.v, apn_converted.l);
+                pdp->apn_use.l = apn_converted.l;
+            } else {
+			    pdp->apn_use.l = options.apn.l;
+			    memcpy(pdp->apn_use.v, options.apn.v, options.apn.l);
+            }
 		}
-
 		pdp->gsnlc.l = sizeof(options.listen);
 		memcpy(pdp->gsnlc.v, &options.listen, sizeof(options.listen));
 		pdp->gsnlu.l = sizeof(options.listen);
