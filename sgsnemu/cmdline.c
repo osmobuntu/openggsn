@@ -68,7 +68,7 @@ const char *gengetopt_args_info_help[] = {
 	"      --pingcount=INT    Number of ping req to send  (default=`0')",
 	"      --pingquiet        Do not print ping packet info  (default=off)",
 	"      --norecovery       Do not send recovery (default=off)",
-    "      --apn_3gpp         Send APN in Create PDP request in 3GPP form",
+    	"      --apn_3gpp         Send APN in Create PDP request in 3GPP form",
 	0
 };
 
@@ -150,7 +150,7 @@ void clear_given(struct gengetopt_args_info *args_info)
 	args_info->pingcount_given = 0;
 	args_info->pingquiet_given = 0;
 	args_info->norecovery_given = 0;
-    args_info->apn_3gpp_given = 0;
+    	args_info->apn_3gpp_given = 0;
 
 }
 
@@ -230,7 +230,7 @@ void clear_args(struct gengetopt_args_info *args_info)
 	args_info->pingcount_orig = NULL;
 	args_info->pingquiet_flag = 0;
 	args_info->norecovery_flag = 0;
-    args_info->apn_3gpp_flag = 0;
+    	args_info->apn_3gpp_flag = 0;
 
 }
 
@@ -269,7 +269,7 @@ void init_args_info(struct gengetopt_args_info *args_info)
 	args_info->pingcount_help = gengetopt_args_info_help[29];
 	args_info->pingquiet_help = gengetopt_args_info_help[30];
 	args_info->norecovery_help = gengetopt_args_info_help[31];
-    args_info->apn_3gpp_help = gengetopt_args_info_help[32];
+    	args_info->apn_3gpp_help = gengetopt_args_info_help[32];
 
 }
 
@@ -832,7 +832,7 @@ cmdline_parser_internal(int argc, char *const *argv,
 			{"pingcount", 1, NULL, 0},
 			{"pingquiet", 0, NULL, 0},
 			{"norecovery", 0, NULL, 0},
-	        {"apn_3gpp", 0, NULL, 0},
+	        	{"apn_3gpp", 0, NULL, 0},
 			{NULL, 0, NULL, 0}
 		};
 
